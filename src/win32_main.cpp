@@ -12,12 +12,7 @@ and may not be redistributed without written permission.*/
 
 #include "win32_structs.h"
 
-// Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-
-typedef void (*update_and_render)(int);
-update_and_render UpdateAndRender;
+win32_program_state state = {};
 
 FILETIME get_file_last_write_date(const char *file_name)
 {
@@ -70,43 +65,60 @@ int WINAPI wWinMain(
 	_In_ LPWSTR cmdLine,
 	_In_ int showCmd)
 {
+	game_code game = win32_load_game_code("game.dll", "game_temp.dll", "lock.tmp");
+
+	state.WindowHeight = 480;
+	state.WindowWidth = 640;
+	state.IsRunning = true;
+
 	// The window we'll be rendering to
 	SDL_Window *window = NULL;
 
 	// The surface contained by the window
 	SDL_Surface *screenSurface = NULL;
 
-	game_code game = win32_load_game_code("game.dll", "game_temp.dll", "lock.tmp");
-
 	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+
+		return -1;
 	}
-	else
+
+	// Create window
+	window = SDL_CreateWindow("Oasis of legends", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, state.WindowWidth, state.WindowHeight, SDL_WINDOW_SHOWN);
+
+	if (window == NULL)
 	{
-		// Create window
-		window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+		printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 
-		if (window == NULL)
+		SDL_Quit();
+
+		return -1;
+	}
+
+	// Get window surface
+	screenSurface = SDL_GetWindowSurface(window);
+
+	// Fill the surface white
+	SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
+
+	// Update the surface
+	SDL_UpdateWindowSurface(window);
+
+	// Event handler
+	SDL_Event sdl_event;
+
+	while (state.IsRunning)
+	{
+		// Handle events on queue
+		while (SDL_PollEvent(&sdl_event) != 0)
 		{
-			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-		}
-		else
-		{
-			// Get window surface
-			screenSurface = SDL_GetWindowSurface(window);
-
-			// Fill the surface white
-			SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
-
-			// Update the surface
-			SDL_UpdateWindowSurface(window);
-
-			game.UpdateAndRender();
-
-			// Wait two seconds
-			SDL_Delay(2000);
+			// User requests quit
+			if (sdl_event.type == SDL_QUIT)
+			{
+				state.IsRunning = false;
+			}
 		}
 	}
 
