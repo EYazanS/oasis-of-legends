@@ -75,7 +75,7 @@ int WINAPI wWinMain(
 	SDL_Window *window = NULL;
 
 	// The surface contained by the window
-	SDL_Surface *screenSurface = NULL;
+	SDL_Surface *screen_surface = NULL;
 
 	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -97,11 +97,16 @@ int WINAPI wWinMain(
 		return -1;
 	}
 
+	// Create a "renderer" for our window.
+	SDL_Renderer *renderer = SDL_CreateRenderer(window,
+												-1,
+												SDL_RENDERER_PRESENTVSYNC);
+
 	// Get window surface
-	screenSurface = SDL_GetWindowSurface(window);
+	screen_surface = SDL_GetWindowSurface(window);
 
 	// Fill the surface white
-	SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
+	SDL_FillRect(screen_surface, NULL, SDL_MapRGB(screen_surface->format, 0xFF, 0xFF, 0xFF));
 
 	// Update the surface
 	SDL_UpdateWindowSurface(window);
@@ -120,6 +125,8 @@ int WINAPI wWinMain(
 				state.IsRunning = false;
 			}
 		}
+
+		game.UpdateAndRender();
 	}
 
 	// Destroy window
