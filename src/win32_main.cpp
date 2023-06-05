@@ -10,6 +10,8 @@ and may not be redistributed without written permission.*/
 #include "memory.h"
 #include "functions.h"
 
+#include "win32_structs.h"
+
 // Screen dimension constants
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -17,14 +19,64 @@ const int SCREEN_HEIGHT = 480;
 typedef void (*update_and_render)(int);
 update_and_render UpdateAndRender;
 
+FILETIME get_file_last_write_date(const char *file_name)
+{
+	WIN32_FILE_ATTRIBUTE_DATA result = {};
+
+	FILETIME last_write_time = {};
+
+	if (GetFileAttributesExA(file_name, GetFileExInfoStandard, &result))
+	{
+		last_write_time = result.ftLastWriteTime;
+	}
+
+	return last_write_time;
+}
+
+// Game
+game_code win32_load_game_code(char *source_dll_name, char *temp_dll_name, char *lock_file_name)
+{
+	game_code result = {};
+
+	WIN32_FILE_ATTRIBUTE_DATA Ignored;
+
+	if (!GetFileAttributesExA(lock_file_name, GetFileExInfoStandard, &Ignored))
+	{
+		result.LastWriteTime = get_file_last_write_date(source_dll_name);
+
+		CopyFileA(source_dll_name, temp_dll_name, FALSE);
+
+		result.LibraryHandle = LoadLibraryA(temp_dll_name);
+
+		if (result.LibraryHandle)
+		{
+			result.UpdateAndRender = (GAMEUPDATEANDRENDER *)GetProcAddress(result.LibraryHandle, "update_and_render");
+			result.IsValid = !!result.UpdateAndRender;
+		}
+	}
+
+	if (!result.IsValid)
+	{
+		result.UpdateAndRender = 0;
+	}
+
+	return result;
+}
+
 // Windows entry point
-int main(int argc, char *args[])
+int WINAPI wWinMain(
+	_In_ HINSTANCE instance,
+	_In_opt_ HINSTANCE prevInstance,
+	_In_ LPWSTR cmdLine,
+	_In_ int showCmd)
 {
 	// The window we'll be rendering to
 	SDL_Window *window = NULL;
 
 	// The surface contained by the window
 	SDL_Surface *screenSurface = NULL;
+
+	game_code game = win32_load_game_code("game.dll", "game_temp.dll", "lock.tmp");
 
 	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -51,45 +103,7 @@ int main(int argc, char *args[])
 			// Update the surface
 			SDL_UpdateWindowSurface(window);
 
-			HMODULE dllHandle = LoadLibraryA("game.dll"); // Load the DLL
-
-			if (dllHandle != NULL)
-			{
-				UpdateAndRender = (update_and_render)GetProcAddress(dllHandle, "update_and_render"); // Get the function pointer
-
-				if (UpdateAndRender != NULL)
-				{
-					// Call the function from the DLL
-					UpdateAndRender(42);
-				}
-				else
-				{
-					printf("Failed to get function pointer.\n");
-				}
-
-				// Cleanup: Release the DLL handle
-				FreeLibrary(dllHandle);
-			}
-			else
-			{
-				// Get the last error code
-				DWORD errorCode = GetLastError();
-
-				// Get the error message associated with the last error code
-				LPSTR errorMessage = NULL;
-				FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER,
-							   NULL,
-							   errorCode,
-							   0,
-							   (LPSTR)&errorMessage,
-							   0,
-							   NULL);
-
-				printf("Failed to load DLL. Error: %s\n", errorMessage);
-
-				// Cleanup: Release the error message buffer
-				LocalFree(errorMessage);
-			}
+			game.UpdateAndRender();
 
 			// Wait two seconds
 			SDL_Delay(2000);
