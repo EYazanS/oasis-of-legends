@@ -2,13 +2,22 @@
 and may not be redistributed without written permission.*/
 
 // Using SDL and standard IO
+#include <Windows.h>
 #include <SDL.h>
 #include <stdio.h>
+
+#include "typesdef.h"
+#include "memory.h"
+#include "functions.h"
 
 // Screen dimension constants
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
+typedef void (*update_and_render)(int);
+update_and_render UpdateAndRender;
+
+// Windows entry point
 int main(int argc, char *args[])
 {
 	// The window we'll be rendering to
@@ -42,6 +51,46 @@ int main(int argc, char *args[])
 			// Update the surface
 			SDL_UpdateWindowSurface(window);
 
+			HMODULE dllHandle = LoadLibraryA("game.dll"); // Load the DLL
+
+			if (dllHandle != NULL)
+			{
+				UpdateAndRender = (update_and_render)GetProcAddress(dllHandle, "update_and_render"); // Get the function pointer
+
+				if (UpdateAndRender != NULL)
+				{
+					// Call the function from the DLL
+					UpdateAndRender(42);
+				}
+				else
+				{
+					printf("Failed to get function pointer.\n");
+				}
+
+				// Cleanup: Release the DLL handle
+				FreeLibrary(dllHandle);
+			}
+			else
+			{
+				// Get the last error code
+				DWORD errorCode = GetLastError();
+
+				// Get the error message associated with the last error code
+				LPSTR errorMessage = NULL;
+				FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+							   NULL,
+							   errorCode,
+							   0,
+							   (LPSTR)&errorMessage,
+							   0,
+							   NULL);
+
+				printf("Failed to load DLL. Error: %s\n", errorMessage);
+
+				// Cleanup: Release the error message buffer
+				LocalFree(errorMessage);
+			}
+
 			// Wait two seconds
 			SDL_Delay(2000);
 		}
@@ -55,14 +104,3 @@ int main(int argc, char *args[])
 
 	return 0;
 }
-
-// Windows entry point
-#ifdef _WIN32
-
-int WinMain(int argc, char *args[])
-{
-	int result = main(argc, args);
-
-	return result;
-}
-#endif

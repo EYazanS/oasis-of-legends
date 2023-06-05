@@ -1,0 +1,4 @@
+LIBRARY game
+EXPORTS
+    update_and_render
+    // Add the names of all the functions you want to export from the DLL
