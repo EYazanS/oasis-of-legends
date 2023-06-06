@@ -21,4 +21,5 @@ struct game_memory
 	b32 IsInitialized;
 };
 
+
 #endif

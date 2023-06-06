@@ -1,6 +1,15 @@
 #ifndef catalyst_intrinsics_h
 #define catalyst_intrinsics_h
 
+#include <math.h>
+#include "typesdef.h"
+
+inline i32 round_real32_to_int32(r32 value)
+{
+	i32 result = (i32)roundf(value);
+	return result;
+}
+
 #if !defined(COMPILER_MSVC)
 #define COMPILER_MSVC 0
 #endif
