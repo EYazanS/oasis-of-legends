@@ -96,8 +96,8 @@ game_memory init_game_memory()
 {
 	game_memory game_memory = {};
 
-#if Leena_Internal
-	LPVOID base_address = (LPVOID)Terabytes(2);
+#if catalyst_Internal
+	LPVOID base_address = (LPVOID)TERABYTES(2);
 #else
 	LPVOID base_address = 0;
 #endif

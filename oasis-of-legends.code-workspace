@@ -4,7 +4,11 @@
 			"path": "."
 		}
 	],
-	"settings": {},
+	"settings": {
+		"C_Cpp.default.defines": [
+			"catalyst_Internal"
+		]
+	},
 	"launch": {
 		"version": "0.2.0",
 		"configurations": [
