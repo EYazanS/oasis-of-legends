@@ -114,7 +114,7 @@ game_memory init_game_memory()
 	return game_memory;
 }
 
-void win32_resize_dib_section(win32_bitmap_buffer *bitmap_buffer, i32 width, i32 height)
+void win32_resize_device_independent_bitmap_section(win32_bitmap_buffer *bitmap_buffer, i32 width, i32 height)
 {
 	if (bitmap_buffer->Memory)
 	{
@@ -139,6 +139,14 @@ void win32_resize_dib_section(win32_bitmap_buffer *bitmap_buffer, i32 width, i32
 	bitmap_buffer->Memory = VirtualAlloc(0, bitmap_memory_size, MEM_COMMIT, PAGE_READWRITE);
 }
 
+void render_screen_buffer(struct screen_buffer *buffer, SDL_Texture *texture, SDL_Renderer *renderer)
+{
+	SDL_UpdateTexture(texture, NULL, buffer->Memory, buffer->Pitch);
+	SDL_RenderClear(renderer);
+	SDL_RenderCopy(renderer, texture, NULL, NULL);
+	SDL_RenderPresent(renderer);
+}
+
 // Windows entry point
 int WINAPI wWinMain(
 	_In_ HINSTANCE instance,
@@ -149,11 +157,9 @@ int WINAPI wWinMain(
 	win32_get_exe_file_name(&state);
 
 	char source_game_code_dll_full_path[MAX_PATH];
-
 	win32_build_exe_path_file_name(&state, "game.dll", sizeof(source_game_code_dll_full_path), source_game_code_dll_full_path);
 
 	char temp_game_code_dll_full_path[MAX_PATH];
-
 	win32_build_exe_path_file_name(&state, "game_temp.dll", sizeof(temp_game_code_dll_full_path), temp_game_code_dll_full_path);
 
 	char game_code_lock_full_path[MAX_PATH];
@@ -166,7 +172,7 @@ int WINAPI wWinMain(
 	state.WindowHeight = 1080;
 	state.WindowWidth = 1920;
 
-	win32_resize_dib_section(&state.BitmapBuffer, state.WindowWidth, state.WindowHeight);
+	win32_resize_device_independent_bitmap_section(&state.BitmapBuffer, state.WindowWidth, state.WindowHeight);
 
 	// The window we'll be rendering to
 	SDL_Window *window = NULL;
@@ -198,6 +204,12 @@ int WINAPI wWinMain(
 	SDL_Renderer *renderer = SDL_CreateRenderer(window,
 												-1,
 												SDL_RENDERER_PRESENTVSYNC);
+
+	SDL_Texture *texture = SDL_CreateTexture(renderer,
+											 SDL_PIXELFORMAT_ARGB8888,
+											 SDL_TEXTUREACCESS_STREAMING,
+											 state.BitmapBuffer.Width,
+											 state.BitmapBuffer.Height);
 
 	// Get window surface
 	screen_surface = SDL_GetWindowSurface(window);
@@ -249,6 +261,8 @@ int WINAPI wWinMain(
 		screen_bufffer.BytesPerPixel = state.BitmapBuffer.BytesPerPixel;
 
 		game.UpdateAndRender(&game_memory, &screen_bufffer);
+
+		render_screen_buffer(&screen_bufffer, texture, renderer);
 	}
 
 	// Destroy window
