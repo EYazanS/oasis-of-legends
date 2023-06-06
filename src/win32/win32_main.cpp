@@ -7,7 +7,7 @@ and may not be redistributed without written permission.*/
 #include <stdio.h>
 
 #include "typesdef.h"
-#include "memory.h"
+#include "memory_util.h"
 #include "functions.h"
 #include "wind32_string.h"
 #include "win32_structs.h"

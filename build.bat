@@ -12,7 +12,7 @@ REM 64-bit build
 del *.pdb > NUL 2> NUL
 REM Optimization switches /O2
 echo WAITING FOR PDB > lock.tmp
-clang++ %CommonCompilerFlags% ../src/win32_main.cpp -o ./main.exe %LinkerFlags% -Wl,/PDB:main_%SUBFILENAME%.pdb -Xlinker -subsystem:windows
+clang++ %CommonCompilerFlags% ../src/win32/win32_main.cpp -o ./main.exe %LinkerFlags% -Wl,/PDB:main_%SUBFILENAME%.pdb -Xlinker -subsystem:windows
 del lock.tmp
 clang++ %CommonCompilerFlags% -shared -o game.dll ../src/game/game.cpp -I../src -Wl,/PDB:game_%SUBFILENAME%.pdb
 popd
