@@ -96,7 +96,7 @@ game_memory init_game_memory()
 {
 	game_memory game_memory = {};
 
-#if catalyst_Internal
+#if catalyst_internal
 	LPVOID base_address = (LPVOID)TERABYTES(2);
 #else
 	LPVOID base_address = 0;

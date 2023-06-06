@@ -6,7 +6,7 @@
 	],
 	"settings": {
 		"C_Cpp.default.defines": [
-			"catalyst_Internal"
+			"catalyst_internal"
 		]
 	},
 	"launch": {
