@@ -7,8 +7,8 @@
 
 void draw_rectangle(
 	screen_buffer *buffer,
-	v2 vec_min, v2 vec_max,
-	v3 colour)
+	vector_2 vec_min, vector_2 vec_max,
+	vector_3 colour)
 {
 	i32 min_x = round_real32_to_int32(vec_min.X);
 	i32 max_x = round_real32_to_int32(vec_max.X);

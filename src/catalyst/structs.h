@@ -16,8 +16,8 @@ struct game_memory
 {
 	memory_index PermanentStorageSize;
 	memory_index TransiateStorageSize;
-	void *PermanentStorage;
-	void *TransiateStorage;
+	data_t PermanentStorage;
+	data_t TransiateStorage;
 	b32 IsInitialized;
 };
 

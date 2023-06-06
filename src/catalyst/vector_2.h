@@ -3,7 +3,7 @@
 
 #include "typesdef.h"
 
-struct v2
+struct vector_2
 {
 	union
 	{
@@ -17,9 +17,9 @@ struct v2
 	};
 };
 
-inline v2 V2(r32 x, r32 y)
+inline vector_2 V2(r32 x, r32 y)
 {
-	v2 result = {};
+	vector_2 result = {};
 
 	result.X = x;
 	result.Y = y;
@@ -27,9 +27,9 @@ inline v2 V2(r32 x, r32 y)
 	return result;
 }
 
-inline v2 operator-(v2 a)
+inline vector_2 operator-(vector_2 a)
 {
-	v2 result = {};
+	vector_2 result = {};
 
 	result.X = -a.X;
 	result.Y = -a.Y;
@@ -37,9 +37,9 @@ inline v2 operator-(v2 a)
 	return result;
 }
 
-inline v2 operator+(v2 a, v2 b)
+inline vector_2 operator+(vector_2 a, vector_2 b)
 {
-	v2 result = {};
+	vector_2 result = {};
 
 	result.X = a.X + b.X;
 	result.Y = a.Y + b.Y;
@@ -47,9 +47,9 @@ inline v2 operator+(v2 a, v2 b)
 	return result;
 }
 
-inline v2 operator-(v2 a, v2 b)
+inline vector_2 operator-(vector_2 a, vector_2 b)
 {
-	v2 result = {};
+	vector_2 result = {};
 
 	result.X = a.X - b.X;
 	result.Y = a.Y - b.Y;
@@ -57,9 +57,9 @@ inline v2 operator-(v2 a, v2 b)
 	return result;
 }
 
-inline v2 operator*(v2 a, r32 b)
+inline vector_2 operator*(vector_2 a, r32 b)
 {
-	v2 result = {};
+	vector_2 result = {};
 
 	result.X = b * a.X;
 	result.Y = b * a.Y;
@@ -67,18 +67,18 @@ inline v2 operator*(v2 a, r32 b)
 	return result;
 }
 
-inline v2 operator*(r32 a, v2 b)
+inline vector_2 operator*(r32 a, vector_2 b)
 {
 	return b * a;
 }
 
-inline v2 &operator+=(v2 &a, v2 b)
+inline vector_2 &operator+=(vector_2 &a, vector_2 b)
 {
 	a = a + b;
 	return a;
 }
 
-inline v2 &operator*=(v2 &a, r32 b)
+inline vector_2 &operator*=(vector_2 &a, r32 b)
 {
 	a = a * b;
 
