@@ -6,7 +6,7 @@
 #include <catalyst/typesdef.h>
 #include <catalyst/structs.h>
 
-#define GAME_UPDATE_AND_RENDER(name) void name(game_memory *memory, screen_buffer *buffer)
+#define GAME_UPDATE_AND_RENDER(name) void name(game_memory *memory, game_input *input, screen_buffer *buffer)
 typedef GAME_UPDATE_AND_RENDER(GAMEUPDATEANDRENDER);
 GAME_UPDATE_AND_RENDER(GameUpdatAndRendereStub){};
 

@@ -21,5 +21,50 @@ struct game_memory
 	b32 IsInitialized;
 };
 
+struct game_button_state
+{
+	i32 HalfTransitionCount;
+	b32 EndedDown;
+};
+
+struct game_controller_input
+{
+	b32 IsConnected;
+	b32 IsAnalog;
+	r32 StickAverageX;
+	r32 StickAverageY;
+
+	union
+	{
+		game_button_state Buttons[12];
+
+		struct
+		{
+			game_button_state MoveUp;
+			game_button_state MoveDown;
+			game_button_state MoveLeft;
+			game_button_state MoveRight;
+
+			game_button_state ActionUp;
+			game_button_state ActionDown;
+			game_button_state ActionLeft;
+			game_button_state ActionRight;
+
+			game_button_state LeftShoulder;
+			game_button_state RightShoulder;
+
+			game_button_state Back;
+			game_button_state Start;
+
+			// NOTE: All buttons must be added above this line
+			game_button_state Terminator;
+		};
+	};
+};
+
+struct game_input
+{
+	game_controller_input Controllers[5];
+};
 
 #endif

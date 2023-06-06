@@ -50,7 +50,24 @@ void draw_rectangle(
 	}
 }
 
-DLL_EXPORT void update_and_render(game_memory *memory, screen_buffer *buffer)
+DLL_EXPORT void update_and_render(game_memory *memory, game_input *input, screen_buffer *buffer)
 {
-	draw_rectangle(buffer, V2(0, 0), V2(buffer->Width, buffer->Height), V3(150, 50, 50));
+	vector_3 colour = V3(150, 50, 50);
+
+	if (input->Controllers[0].MoveLeft.EndedDown)
+	{
+		colour.R += 150;
+	}
+
+	if (input->Controllers[0].MoveRight.EndedDown)
+	{
+		colour.G += 150;
+	}
+
+	if (input->Controllers[0].MoveUp.EndedDown)
+	{
+		colour.B += 150;
+	}
+
+	draw_rectangle(buffer, V2(0, 0), V2(buffer->Width, buffer->Height), colour);
 }
