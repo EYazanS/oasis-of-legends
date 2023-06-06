@@ -279,19 +279,20 @@ int WINAPI wWinMain(
 
 	state.IsRunning = true;
 
-	r64 time_to_advance;
-
 	screen_buffer screen_bufffer = {};
 
 	game_input inputs[2] = {};
-	game_input *new_input = &inputs[0];
+	game_input *current_input = &inputs[0];
 	game_input *old_input = &inputs[1];
+	game_input *temp_input;
 
-	game_controller_input *new_keyboard_controller = get_controller(new_input, 0);
+	game_controller_input *old_keyboard_controller = get_controller(current_input, 0);
+	game_controller_input *new_keyboard_controller = get_controller(current_input, 0);
+	SDL_Keycode key_code;
 
 	while (state.IsRunning)
 	{
-		time_to_advance = target_seconds_to_advance_by;
+		current_input->TimeToAdvance = target_seconds_to_advance_by;
 
 		FILETIME new_last_write_time = get_file_last_write_date(source_game_code_dll_full_path);
 
@@ -302,7 +303,13 @@ int WINAPI wWinMain(
 			game.LastWriteTime = new_last_write_time;
 		}
 
-		new_keyboard_controller = get_controller(new_input, 0);
+		old_keyboard_controller = get_controller(old_input, 0);
+		new_keyboard_controller = get_controller(current_input, 0);
+
+		for (int ButtonIndex = 0; ButtonIndex < ARRAYCOUNT(new_keyboard_controller->Buttons); ++ButtonIndex)
+		{
+			new_keyboard_controller->Buttons[ButtonIndex].EndedDown = old_keyboard_controller->Buttons[ButtonIndex].EndedDown;
+		}
 
 		// Handle events on queue
 		while (SDL_PollEvent(&sdl_event) != 0)
@@ -312,90 +319,79 @@ int WINAPI wWinMain(
 			case SDL_KEYDOWN:
 			case SDL_KEYUP:
 			{
-				SDL_Keycode KeyCode = sdl_event.key.keysym.sym;
-				bool IsDown = (sdl_event.key.state == SDL_PRESSED);
-				bool WasDown = false;
+				key_code = sdl_event.key.keysym.sym;
+				bool is_down = (sdl_event.key.state == SDL_PRESSED);
+				bool was_down = false;
+
 				if (sdl_event.key.state == SDL_RELEASED)
 				{
-					WasDown = true;
+					was_down = true;
 				}
 				else if (sdl_event.key.repeat != 0)
 				{
-					WasDown = true;
+					was_down = true;
 				}
 
-				// NOTE: In the windows version, we used "if (IsDown != WasDown)"
+				// NOTE: In the windows version, we used "if (is_down != WasDown)"
 				// to detect key repeats. SDL has the 'repeat' value, though,
 				// which we'll use.
 				if (sdl_event.key.repeat == 0)
 				{
-					if (KeyCode == SDLK_w)
+					switch (key_code)
 					{
-						SDLProcessKeyPress(&new_keyboard_controller->MoveUp, IsDown);
-					}
-					else if (KeyCode == SDLK_a)
-					{
-						SDLProcessKeyPress(&new_keyboard_controller->MoveLeft, IsDown);
-					}
-					else if (KeyCode == SDLK_s)
-					{
-						SDLProcessKeyPress(&new_keyboard_controller->MoveDown, IsDown);
-					}
-					else if (KeyCode == SDLK_d)
-					{
-						SDLProcessKeyPress(&new_keyboard_controller->MoveRight, IsDown);
-					}
-					else if (KeyCode == SDLK_q)
-					{
-						SDLProcessKeyPress(&new_keyboard_controller->LeftShoulder, IsDown);
-					}
-					else if (KeyCode == SDLK_e)
-					{
-						SDLProcessKeyPress(&new_keyboard_controller->RightShoulder, IsDown);
-					}
-					else if (KeyCode == SDLK_UP)
-					{
-						SDLProcessKeyPress(&new_keyboard_controller->ActionUp, IsDown);
-					}
-					else if (KeyCode == SDLK_LEFT)
-					{
-						SDLProcessKeyPress(&new_keyboard_controller->ActionLeft, IsDown);
-					}
-					else if (KeyCode == SDLK_DOWN)
-					{
-						SDLProcessKeyPress(&new_keyboard_controller->ActionDown, IsDown);
-					}
-					else if (KeyCode == SDLK_RIGHT)
-					{
-						SDLProcessKeyPress(&new_keyboard_controller->ActionRight, IsDown);
-					}
-					else if (KeyCode == SDLK_ESCAPE)
-					{
+					case SDLK_w:
+						SDLProcessKeyPress(&new_keyboard_controller->MoveUp, is_down);
+						break;
+					case SDLK_a:
+						SDLProcessKeyPress(&new_keyboard_controller->MoveLeft, is_down);
+						break;
+					case SDLK_s:
+						SDLProcessKeyPress(&new_keyboard_controller->MoveDown, is_down);
+						break;
+					case SDLK_d:
+						SDLProcessKeyPress(&new_keyboard_controller->MoveRight, is_down);
+						break;
+					case SDLK_q:
+						SDLProcessKeyPress(&new_keyboard_controller->LeftShoulder, is_down);
+						break;
+					case SDLK_e:
+						SDLProcessKeyPress(&new_keyboard_controller->RightShoulder, is_down);
+						break;
+					case SDLK_UP:
+						SDLProcessKeyPress(&new_keyboard_controller->ActionUp, is_down);
+						break;
+					case SDLK_LEFT:
+						SDLProcessKeyPress(&new_keyboard_controller->ActionLeft, is_down);
+						break;
+					case SDLK_DOWN:
+						SDLProcessKeyPress(&new_keyboard_controller->ActionDown, is_down);
+						break;
+					case SDLK_RIGHT:
+						SDLProcessKeyPress(&new_keyboard_controller->ActionRight, is_down);
+						break;
+					case SDLK_ESCAPE:
 						printf("ESCAPE: ");
-
-						if (IsDown)
+						if (is_down)
 						{
-							printf("IsDown ");
+							printf("Is Down\n");
 						}
-						if (WasDown)
+						if (was_down)
 						{
-							printf("WasDown");
+							printf("Was Down\n");
 						}
-
 						printf("\n");
-					}
-					else if (KeyCode == SDLK_SPACE)
-					{
-					}
-					else if (KeyCode == SDLK_RETURN)
-					{
-						SDLProcessKeyPress(&new_keyboard_controller->Start, IsDown);
+						break;
+					case SDLK_SPACE:
+						break;
+					case SDLK_RETURN:
+						SDLProcessKeyPress(&new_keyboard_controller->Start, is_down);
+						break;
 					}
 				}
 
 				b32 AltKeyWasDown = (sdl_event.key.keysym.mod & KMOD_ALT);
 
-				if (KeyCode == SDLK_F4 && AltKeyWasDown)
+				if (key_code == SDLK_F4 && AltKeyWasDown)
 				{
 					state.IsRunning = false;
 				}
@@ -419,7 +415,7 @@ int WINAPI wWinMain(
 		screen_bufffer.Pitch = state.BitmapBuffer.Pitch;
 		screen_bufffer.BytesPerPixel = state.BitmapBuffer.BytesPerPixel;
 
-		game.UpdateAndRender(&game_memory, new_input, &screen_bufffer);
+		game.UpdateAndRender(&game_memory, current_input, &screen_bufffer);
 
 		i64 workCounter = win32_get_wall_clock();
 
@@ -455,6 +451,11 @@ int WINAPI wWinMain(
 			// missed a frame
 			printf("Missed a frame\n");
 		}
+
+		// Swap the states of the input so they persist through frames
+		temp_input = current_input;
+		current_input = old_input;
+		old_input = temp_input;
 
 		// Display performance counter
 		i64 end_counter = win32_get_wall_clock();

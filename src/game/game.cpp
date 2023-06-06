@@ -52,7 +52,7 @@ void draw_rectangle(
 
 DLL_EXPORT void update_and_render(game_memory *memory, game_input *input, screen_buffer *buffer)
 {
-	vector_3 colour = V3(150, 50, 50);
+	vector_3 colour = V3(50, 50, 50);
 
 	if (input->Controllers[0].MoveLeft.EndedDown)
 	{

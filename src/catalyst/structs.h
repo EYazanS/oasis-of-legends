@@ -64,6 +64,8 @@ struct game_controller_input
 
 struct game_input
 {
+	r64 TimeToAdvance;
+
 	game_controller_input Controllers[5];
 };
 
