@@ -3,7 +3,7 @@
 IF NOT EXIST build mkdir build
 
 set CommonCompilerFlags=-std=c++17 -m64 -g -Werror -fno-exceptions -fwritable-strings -O0 -Wno-unknown-warning-option -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Dcatalyst_internal=1 -Dcatalyst_slow=1 -Dcatalyst_Win32=1
-set LinkerFlags=-I../src  -I../libs/sdl/include -L ../libs/sdl/libs -lshell32.lib -lSDL2main -lSDL2
+set LinkerFlags=-I../src  -I../libs/sdl/include -L ../libs/sdl/libs -lshell32.lib -lWinmm.lib -lSDL2main -lSDL2
 set SUBFILENAME=%date:~-4,4%%date:~-10,2%%date:~-7,2%_%time:~0,2%%time:~3,2%%time:~6,2%
 
 xcopy /E /I /Y "./libs/sdl/libs" "./build"

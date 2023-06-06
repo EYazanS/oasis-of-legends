@@ -147,6 +147,38 @@ void render_screen_buffer(struct screen_buffer *buffer, SDL_Texture *texture, SD
 	SDL_RenderPresent(renderer);
 }
 
+u32 get_screen_refresh_rate()
+{
+	SDL_DisplayMode mode;
+
+	if (SDL_GetCurrentDisplayMode(0, &mode) == 0)
+	{
+		return mode.refresh_rate;
+	}
+
+	// Failed to get the screen refresh rate, fallback to a default value
+	return 60; // Default to 60 Hz
+}
+
+inline i64 win32_get_performance_frequence()
+{
+	LARGE_INTEGER performance_frequence_result;
+	QueryPerformanceFrequency(&performance_frequence_result);
+	return performance_frequence_result.QuadPart;
+}
+
+inline i64 win32_get_wall_clock()
+{
+	LARGE_INTEGER counter;
+	QueryPerformanceCounter(&counter);
+	return counter.QuadPart;
+}
+
+inline r32 get_seconds_elapsed(u64 start, u64 end, u64 performanceFrequence)
+{
+	return (r32)(end - start) / (r32)performanceFrequence;
+}
+
 // Windows entry point
 int WINAPI wWinMain(
 	_In_ HINSTANCE instance,
@@ -169,6 +201,8 @@ int WINAPI wWinMain(
 
 	game_memory game_memory = init_game_memory();
 
+	state.PerformanceFrequence = win32_get_performance_frequence();
+
 	state.WindowHeight = 1080;
 	state.WindowWidth = 1920;
 
@@ -176,9 +210,6 @@ int WINAPI wWinMain(
 
 	// The window we'll be rendering to
 	SDL_Window *window = NULL;
-
-	// The surface contained by the window
-	SDL_Surface *screen_surface = NULL;
 
 	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -211,22 +242,36 @@ int WINAPI wWinMain(
 											 state.BitmapBuffer.Width,
 											 state.BitmapBuffer.Height);
 
-	// Get window surface
-	screen_surface = SDL_GetWindowSurface(window);
-
-	// Fill the surface white
-	SDL_FillRect(screen_surface, NULL, SDL_MapRGB(screen_surface->format, 0xFF, 0xFF, 0xFF));
-
 	// Update the surface
 	SDL_UpdateWindowSurface(window);
+
+	// Get the screen refresh rate
+	u32 monitor_refresh_rate = get_screen_refresh_rate();
+
+	u32 game_update_in_hz = monitor_refresh_rate / 2; // In HZ
+
+	r64 target_seconds_to_advance_by = 1.0 / game_update_in_hz;
+
+	// Get how many cycle the cpu went through
+	u64 last_cycle_count = __rdtsc();
+	// Get current cpu time
+	i64 last_counter = win32_get_wall_clock();
+
+	UINT desiredSchedularTimeInMs = 1;
+
+	b32 is_sleep_granular = timeBeginPeriod(desiredSchedularTimeInMs) == TIMERR_NOERROR;
 
 	// Event handler
 	SDL_Event sdl_event;
 
 	state.IsRunning = true;
 
+	r64 time_to_advance;
+
 	while (state.IsRunning)
 	{
+		time_to_advance = target_seconds_to_advance_by;
+
 		FILETIME new_last_write_time = get_file_last_write_date(source_game_code_dll_full_path);
 
 		if (CompareFileTime(&new_last_write_time, &game.LastWriteTime) != 0)
@@ -262,7 +307,50 @@ int WINAPI wWinMain(
 
 		game.UpdateAndRender(&game_memory, &screen_bufffer);
 
+		i64 workCounter = win32_get_wall_clock();
+
+		r64 work_seconds_elapsed = get_seconds_elapsed(last_counter, workCounter, state.PerformanceFrequence);
+
 		render_screen_buffer(&screen_bufffer, texture, renderer);
+
+		r64 time_taken_on_frame = work_seconds_elapsed;
+
+		// Make sure we stay at the target time for each frame.
+		if (time_taken_on_frame < target_seconds_to_advance_by)
+		{
+			if (is_sleep_granular)
+			{
+				// We substract 2 ms from the sleep incase the os doesnt wake us on time
+				DWORD sleep_ms = (DWORD)(1000.f * (target_seconds_to_advance_by - time_taken_on_frame)) - 2;
+
+				if (sleep_ms > 0 && sleep_ms < 40)
+					Sleep(sleep_ms);
+			}
+
+			r32 testTimeTakenOnFrame = get_seconds_elapsed(last_counter, win32_get_wall_clock(), state.PerformanceFrequence);
+
+			// Assert(testTimeTakenOnFrame < targetSecondsPerFrams);
+
+			while (time_taken_on_frame < target_seconds_to_advance_by)
+			{
+				time_taken_on_frame = get_seconds_elapsed(last_counter, win32_get_wall_clock(), state.PerformanceFrequence);
+			}
+		}
+		else
+		{
+			// missed a frame
+			printf("Missed a frame\n");
+		}
+
+		// Display performance counter
+		i64 end_counter = win32_get_wall_clock();
+		r32 ms_per_frame = 1000.0f * get_seconds_elapsed(last_counter, end_counter, state.PerformanceFrequence);
+		last_counter = end_counter;
+		
+		// Register last counter we got
+		r32 FPS = (1000.0f / ms_per_frame);
+
+		printf("%.02fms/f, %.02fFPS, (%.02fws/f)\n", ms_per_frame, FPS, work_seconds_elapsed * 1000.0f);
 	}
 
 	// Destroy window
