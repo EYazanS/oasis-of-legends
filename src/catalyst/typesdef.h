@@ -1,5 +1,5 @@
-#ifndef typesdef_h
-#define typesdef_h
+#ifndef catalyst_typesdef_h
+#define catalyst_typesdef_h
 
 #include <stdint.h>
 

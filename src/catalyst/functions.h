@@ -1,5 +1,5 @@
-#ifndef functions_h
-#define functions_h
+#ifndef catalyst_functions_h
+#define catalyst_functions_h
 
 #define KILOBYTES(Value) ((Value)*1024LL)
 #define MEGABYTES(Value) (KILOBYTES(Value) * 1024LL)

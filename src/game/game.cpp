@@ -1,8 +1,8 @@
 #include "stdio.h"
 
-#include <game_structs.h>
-#include <typesdef.h>
-#include <intrinsics.h>
+#include <catalyst/structs.h>
+#include <catalyst/typesdef.h>
+#include <catalyst/intrinsics.h>
 
 DLL_EXPORT void update_and_render(game_memory *memory, screen_buffer *buffer)
 {

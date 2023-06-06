@@ -6,12 +6,13 @@ and may not be redistributed without written permission.*/
 #include <SDL.h>
 #include <stdio.h>
 
-#include "typesdef.h"
-#include "memory_util.h"
-#include "functions.h"
-#include "wind32_string.h"
+#include <catalyst/strings.h>
+#include <catalyst/memory.h>
+#include <catalyst/structs.h>
+#include <catalyst/typesdef.h>
+#include <catalyst/functions.h>
+
 #include "win32_structs.h"
-#include "game_structs.h"
 
 win32_program_state state = {};
 
@@ -116,7 +117,9 @@ game_memory init_game_memory()
 void win32_resize_dib_section(win32_bitmap_buffer *bitmap_buffer, i32 width, i32 height)
 {
 	if (bitmap_buffer->Memory)
+	{
 		VirtualFree(bitmap_buffer->Memory, NULL, MEM_RELEASE);
+	}
 
 	bitmap_buffer->Width = width;
 	bitmap_buffer->Height = height;
@@ -158,7 +161,7 @@ int WINAPI wWinMain(
 
 	game_code game = win32_load_game_code(source_game_code_dll_full_path, temp_game_code_dll_full_path, game_code_lock_full_path);
 
-	game_memory g_memory = init_game_memory();
+	game_memory game_memory = init_game_memory();
 
 	state.WindowHeight = 1080;
 	state.WindowWidth = 1920;
@@ -237,15 +240,15 @@ int WINAPI wWinMain(
 			}
 		}
 
-		screen_buffer screen_buf = {};
+		screen_buffer screen_bufffer = {};
 
-		screen_buf.Memory = state.BitmapBuffer.Memory;
-		screen_buf.Width = state.BitmapBuffer.Width;
-		screen_buf.Height = state.BitmapBuffer.Height;
-		screen_buf.Pitch = state.BitmapBuffer.Pitch;
-		screen_buf.BytesPerPixel = state.BitmapBuffer.BytesPerPixel;
+		screen_bufffer.Memory = state.BitmapBuffer.Memory;
+		screen_bufffer.Width = state.BitmapBuffer.Width;
+		screen_bufffer.Height = state.BitmapBuffer.Height;
+		screen_bufffer.Pitch = state.BitmapBuffer.Pitch;
+		screen_bufffer.BytesPerPixel = state.BitmapBuffer.BytesPerPixel;
 
-		game.UpdateAndRender(&g_memory, &screen_buf);
+		game.UpdateAndRender(&game_memory, &screen_bufffer);
 	}
 
 	// Destroy window

@@ -1,5 +1,5 @@
-#ifndef memory_h
-#define memory_h
+#ifndef catalyst_memory_h
+#define catalyst_memory_h
 
 #include <stdlib.h>
 
@@ -19,23 +19,6 @@ void *clone_value(u64 size, data_t source)
 	}
 
 	return target;
-}
-
-b32 compare_strings(char *str1, char *str2)
-{
-	memory_index index = 0;
-
-	while (str1[index])
-	{
-		if (str1[index] != str2[index])
-		{
-			return 0;
-		}
-
-		index++;
-	}
-
-	return 1;
 }
 
 inline void clear_memory(memory_index size, void *ptr)
@@ -59,19 +42,6 @@ void set_memory(memory_index data_size, data_t source, i64 val)
 	{
 		current_byte[i] = value;
 	}
-}
-
-u32 str_length(char *source)
-{
-	u32 size = 0;
-
-	while (source[size])
-	{
-		size++;
-	}
-
-	// Calculate the null terminator
-	return size + 1;
 }
 
 #endif

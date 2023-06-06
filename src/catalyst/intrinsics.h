@@ -1,5 +1,5 @@
-#ifndef intrinsics_h
-#define intrinsics_h
+#ifndef catalyst_intrinsics_h
+#define catalyst_intrinsics_h
 
 #if !defined(COMPILER_MSVC)
 #define COMPILER_MSVC 0

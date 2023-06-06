@@ -1,5 +1,5 @@
-#ifndef game_structs_h
-#define game_structs_h
+#ifndef catalyst_structs_h
+#define catalyst_structs_h
 
 #include "typesdef.h"
 

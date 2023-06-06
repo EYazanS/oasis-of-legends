@@ -1,14 +1,14 @@
 #ifndef win32_structs_h
 #define win32_structs_h
 
-#include "game_structs.h"
+#include <Windows.h>
+
+#include <catalyst/typesdef.h>
+#include <catalyst/structs.h>
 
 #define GAME_UPDATE_AND_RENDER(name) void name(game_memory *memory, screen_buffer *buffer)
 typedef GAME_UPDATE_AND_RENDER(GAMEUPDATEANDRENDER);
 GAME_UPDATE_AND_RENDER(GameUpdatAndRendereStub){};
-
-#include <Windows.h>
-#include <typesdef.h>
 
 struct game_code
 {
