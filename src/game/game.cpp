@@ -52,22 +52,45 @@ void draw_rectangle(
 
 DLL_EXPORT void update_and_render(game_memory *memory, game_input *input, screen_buffer *buffer)
 {
-	vector_3 colour = V3(50, 50, 50);
+	game_state *current_game_state = (game_state *)memory->PermanentStorage;
+
+	if (!memory->IsInitialized)
+	{
+		memory->IsInitialized = true;
+		current_game_state->colour = V3(50, 50, 50);
+	}
+
+	vector_3 *colour = &current_game_state->colour;
 
 	if (input->Controllers[0].MoveLeft.EndedDown)
 	{
-		colour.R += 150;
+		colour->R += 1;
+
+		if (colour->R > 255)
+		{
+			colour->R = 0;
+		}
 	}
 
 	if (input->Controllers[0].MoveRight.EndedDown)
 	{
-		colour.G += 150;
+		colour->G += 1;
+
+		if (colour->G > 255)
+		{
+			colour->G = 0;
+		}
 	}
 
 	if (input->Controllers[0].MoveUp.EndedDown)
 	{
-		colour.B += 150;
+		colour->B += 1;
+
+		if (colour->B > 255)
+		{
+			colour->B = 0;
+		}
 	}
 
-	draw_rectangle(buffer, V2(0, 0), V2(buffer->Width, buffer->Height), colour);
+	draw_rectangle(buffer, V2(0, 0), V2(buffer->Width, buffer->Height), *colour);
 }

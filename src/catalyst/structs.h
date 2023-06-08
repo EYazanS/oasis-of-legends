@@ -1,6 +1,7 @@
 #ifndef catalyst_structs_h
 #define catalyst_structs_h
 
+#include "math.h"
 #include "typesdef.h"
 
 #if catalyst_internal
@@ -96,6 +97,11 @@ struct game_input
 	r64 TimeToAdvance;
 
 	game_controller_input Controllers[5];
+};
+
+struct game_state
+{
+	vector_3 colour;
 };
 
 #endif
