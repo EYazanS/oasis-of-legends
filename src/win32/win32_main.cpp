@@ -23,6 +23,85 @@ void win32_build_exe_path_file_name(win32_program_state *state, char *file_name,
 					dest_count, dest);
 }
 
+debug_read_file_result debug_platform_read_entire_file(char *file_name)
+{
+	debug_read_file_result result = {};
+
+	char full_file_name[MAX_PATH];
+
+	win32_build_exe_path_file_name(&state, file_name, sizeof(full_file_name), full_file_name);
+
+	HANDLE file_handle = CreateFileA(full_file_name, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_ALWAYS, NULL, NULL);
+
+	if (file_handle != INVALID_HANDLE_VALUE)
+	{
+		LARGE_INTEGER file_size;
+
+		if (GetFileSizeEx(file_handle, &file_size))
+		{
+			u32 file_size_32 = (u32)file_size.QuadPart;
+
+			void *mem_result = VirtualAlloc(NULL, file_size_32, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+
+			if (mem_result)
+			{
+				DWORD bytes_read;
+
+				if (ReadFile(file_handle, mem_result, file_size_32, &bytes_read, NULL))
+				{
+					result.ContentsSize = file_size_32;
+
+					result.Contents = mem_result;
+				}
+				else
+				{
+					// Free memory if read fail
+					debug_platform_free_file_memory(mem_result);
+
+					mem_result = 0;
+				}
+			}
+		}
+
+		CloseHandle(file_handle);
+	}
+
+	return result;
+}
+
+void debug_platform_free_file_memory(void *memory)
+{
+	if (memory)
+	{
+		VirtualFree(memory, NULL, MEM_RELEASE);
+	}
+}
+
+b32 debug_platform_write_entire_file(char *file_name, u32 memory_size, void *memory)
+{
+	b32 result = 0;
+
+	char full_file_name[MAX_PATH];
+
+	win32_build_exe_path_file_name(&state, file_name, sizeof(full_file_name), full_file_name);
+
+	HANDLE file_handle = CreateFileA(full_file_name, GENERIC_WRITE, NULL, NULL, CREATE_ALWAYS, NULL, NULL);
+
+	if (file_handle != INVALID_HANDLE_VALUE)
+	{
+		DWORD bytes_written;
+
+		if (WriteFile(file_handle, memory, memory_size, &bytes_written, NULL))
+		{
+			result = bytes_written == memory_size;
+		}
+
+		CloseHandle(file_handle);
+	}
+
+	return result;
+}
+
 void win32_get_exe_file_name(win32_program_state *State)
 {
 	DWORD size_of_file_name = GetModuleFileNameA(0, State->ExeFileName, sizeof(State->ExeFileName));
@@ -110,6 +189,11 @@ game_memory init_game_memory()
 
 	game_memory.PermanentStorage = VirtualAlloc(base_address, total_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 	game_memory.TransiateStorage = (u8 *)game_memory.PermanentStorage + game_memory.PermanentStorageSize;
+
+
+	game_memory.FreeFile = debug_platform_free_file_memory;
+	game_memory.ReadFile = debug_platform_read_entire_file;
+	game_memory.WriteFile = debug_platform_write_entire_file;
 
 	return game_memory;
 }
@@ -304,11 +388,12 @@ int WINAPI wWinMain(
 		}
 
 		old_keyboard_controller = get_controller(old_input, 0);
+
 		new_keyboard_controller = get_controller(current_input, 0);
 
-		for (int ButtonIndex = 0; ButtonIndex < ARRAYCOUNT(new_keyboard_controller->Buttons); ++ButtonIndex)
+		for (int button_index = 0; button_index < ARRAYCOUNT(new_keyboard_controller->Buttons); ++button_index)
 		{
-			new_keyboard_controller->Buttons[ButtonIndex].EndedDown = old_keyboard_controller->Buttons[ButtonIndex].EndedDown;
+			new_keyboard_controller->Buttons[button_index].EndedDown = old_keyboard_controller->Buttons[button_index].EndedDown;
 		}
 
 		// Handle events on queue

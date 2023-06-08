@@ -3,6 +3,31 @@
 
 #include "typesdef.h"
 
+#if catalyst_internal
+/* IMPORTANT:
+   These are NOT for doing anything in the shipping game - they are
+   blocking and the write doesn't protect against lost data!
+*/
+struct debug_read_file_result
+{
+	u32 ContentsSize;
+	void *Contents;
+};
+
+debug_read_file_result debug_platform_read_entire_file(char *file_name);
+void debug_platform_free_file_memory(void *memory);
+b32 debug_platform_write_entire_file(char *file_name, u32 MemorySize, void *memory);
+
+#define Debug_Platform_Free_File_Memory(name) void name(void *memory)
+typedef Debug_Platform_Free_File_Memory(platform_free_file_memory);
+
+#define Debug_Platform_Read_Entire_File(name) debug_read_file_result name(char *file_name)
+typedef Debug_Platform_Read_Entire_File(platform_read_entire_file);
+
+#define Debug_Platform_Write_Entire_File(name) b32 name(char *fileName, u32 memorySize, void *memory)
+typedef Debug_Platform_Write_Entire_File(platform_write_entire_file);
+#endif
+
 struct screen_buffer
 {
 	void *Memory;
@@ -19,6 +44,10 @@ struct game_memory
 	data_t PermanentStorage;
 	data_t TransiateStorage;
 	b32 IsInitialized;
+
+	platform_free_file_memory *FreeFile;
+	platform_read_entire_file *ReadFile;
+	platform_write_entire_file *WriteFile;
 };
 
 struct game_button_state
