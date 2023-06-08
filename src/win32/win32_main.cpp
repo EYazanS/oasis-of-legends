@@ -14,18 +14,18 @@ and may not be redistributed without written permission.*/
 
 #include "win32_structs.h"
 
-win32_program_state state = {};
+Win32ProgramState state = {};
 
-void win32_build_exe_path_file_name(win32_program_state *state, char *file_name, int dest_count, char *dest)
+void win32_build_exe_path_file_name(Win32ProgramState *state, char *file_name, int dest_count, char *dest)
 {
 	con_cat_strings(state->OnePastLastEXEFileNameSlash - state->ExeFileName, state->ExeFileName,
 					str_length(file_name), file_name,
 					dest_count, dest);
 }
 
-debug_read_file_result debug_platform_read_entire_file(char *file_name)
+DebugReadFileResult debug_platform_read_entire_file(char *file_name)
 {
-	debug_read_file_result result = {};
+	DebugReadFileResult result = {};
 
 	char full_file_name[MAX_PATH];
 
@@ -102,7 +102,7 @@ b32 debug_platform_write_entire_file(char *file_name, u32 memory_size, void *mem
 	return result;
 }
 
-void win32_get_exe_file_name(win32_program_state *State)
+void win32_get_exe_file_name(Win32ProgramState *State)
 {
 	DWORD size_of_file_name = GetModuleFileNameA(0, State->ExeFileName, sizeof(State->ExeFileName));
 
@@ -131,7 +131,7 @@ FILETIME get_file_last_write_date(const char *file_name)
 	return last_write_time;
 }
 
-void win32_unload_game_code(game_code *code)
+void win32_unload_game_code(GameCode *code)
 {
 	if (code->LibraryHandle)
 	{
@@ -143,9 +143,9 @@ void win32_unload_game_code(game_code *code)
 }
 
 // Game
-game_code win32_load_game_code(char *source_dll_name, char *temp_dll_name, char *lock_file_name)
+GameCode win32_load_game_code(char *source_dll_name, char *temp_dll_name, char *lock_file_name)
 {
-	game_code result = {};
+	GameCode result = {};
 
 	WIN32_FILE_ATTRIBUTE_DATA Ignored;
 
@@ -172,9 +172,9 @@ game_code win32_load_game_code(char *source_dll_name, char *temp_dll_name, char 
 	return result;
 }
 
-game_memory init_game_memory()
+GameMemory init_game_memory()
 {
-	game_memory game_memory = {};
+	GameMemory game_memory = {};
 
 #if catalyst_internal
 	LPVOID base_address = (LPVOID)TERABYTES(2);
@@ -198,7 +198,7 @@ game_memory init_game_memory()
 	return game_memory;
 }
 
-void win32_resize_device_independent_bitmap_section(win32_bitmap_buffer *bitmap_buffer, i32 width, i32 height)
+void win32_resize_device_independent_bitmap_section(Win32BitmapBuffer *bitmap_buffer, i32 width, i32 height)
 {
 	if (bitmap_buffer->Memory)
 	{
@@ -223,7 +223,7 @@ void win32_resize_device_independent_bitmap_section(win32_bitmap_buffer *bitmap_
 	bitmap_buffer->Memory = VirtualAlloc(0, bitmap_memory_size, MEM_COMMIT, PAGE_READWRITE);
 }
 
-void render_screen_buffer(struct screen_buffer *buffer, SDL_Texture *texture, SDL_Renderer *renderer)
+void render_screen_buffer(struct ScreenBuffer *buffer, SDL_Texture *texture, SDL_Renderer *renderer)
 {
 	SDL_UpdateTexture(texture, NULL, buffer->Memory, buffer->Pitch);
 	SDL_RenderClear(renderer);
@@ -263,15 +263,15 @@ inline r32 get_seconds_elapsed(u64 start, u64 end, u64 performanceFrequence)
 	return (r32)(end - start) / (r32)performanceFrequence;
 }
 
-void SDLProcessKeyPress(game_button_state *new_state, b32 Is_down)
+void SDLProcessKeyPress(GameButtonState *new_state, b32 Is_down)
 {
 	new_state->EndedDown = Is_down;
 	++new_state->HalfTransitionCount;
 }
 
-game_controller_input *get_controller(game_input *input, memory_index controller_index)
+GameControllerInput *get_controller(GameInput *input, memory_index controller_index)
 {
-	game_controller_input *result = &input->Controllers[controller_index];
+	GameControllerInput *result = &input->Controllers[controller_index];
 
 	return (result);
 }
@@ -294,9 +294,9 @@ int WINAPI wWinMain(
 	char game_code_lock_full_path[MAX_PATH];
 	win32_build_exe_path_file_name(&state, "lock.tmp", sizeof(game_code_lock_full_path), game_code_lock_full_path);
 
-	game_code game = win32_load_game_code(source_game_code_dll_full_path, temp_game_code_dll_full_path, game_code_lock_full_path);
+	GameCode game = win32_load_game_code(source_game_code_dll_full_path, temp_game_code_dll_full_path, game_code_lock_full_path);
 
-	game_memory game_memory = init_game_memory();
+	GameMemory game_memory = init_game_memory();
 
 	state.PerformanceFrequence = win32_get_performance_frequence();
 
@@ -363,15 +363,15 @@ int WINAPI wWinMain(
 
 	state.IsRunning = true;
 
-	screen_buffer screen_bufffer = {};
+	ScreenBuffer screen_bufffer = {};
 
-	game_input inputs[2] = {};
-	game_input *current_input = &inputs[0];
-	game_input *old_input = &inputs[1];
-	game_input *temp_input;
+	GameInput inputs[2] = {};
+	GameInput *current_input = &inputs[0];
+	GameInput *old_input = &inputs[1];
+	GameInput *temp_input;
 
-	game_controller_input *old_keyboard_controller = get_controller(current_input, 0);
-	game_controller_input *new_keyboard_controller = get_controller(current_input, 0);
+	GameControllerInput *old_keyboard_controller = get_controller(current_input, 0);
+	GameControllerInput *new_keyboard_controller = get_controller(current_input, 0);
 	SDL_Keycode key_code;
 
 	while (state.IsRunning)

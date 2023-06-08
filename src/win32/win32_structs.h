@@ -6,11 +6,11 @@
 #include <catalyst/typesdef.h>
 #include <catalyst/structs.h>
 
-#define GAME_UPDATE_AND_RENDER(name) void name(game_memory *memory, game_input *input, screen_buffer *buffer)
+#define GAME_UPDATE_AND_RENDER(name) void name(GameMemory *memory, GameInput *input, ScreenBuffer *buffer)
 typedef GAME_UPDATE_AND_RENDER(GAMEUPDATEANDRENDER);
 GAME_UPDATE_AND_RENDER(GameUpdatAndRendereStub){};
 
-struct game_code
+struct GameCode
 {
 	HMODULE LibraryHandle;
 	GAMEUPDATEANDRENDER *UpdateAndRender;
@@ -18,7 +18,7 @@ struct game_code
 	FILETIME LastWriteTime;
 };
 
-struct win32_bitmap_buffer
+struct Win32BitmapBuffer
 {
 	BITMAPINFO Info;
 	void* Memory;
@@ -28,14 +28,14 @@ struct win32_bitmap_buffer
 	int Pitch;
 };
 
-struct win32_program_state
+struct Win32ProgramState
 {
 	b32 IsRunning;
 	b32 ShowCursor;
 	b32 IsFullScreen;
 	i32 WindowWidth;
 	i32 WindowHeight;
-	win32_bitmap_buffer BitmapBuffer;
+	Win32BitmapBuffer BitmapBuffer;
 	WINDOWPLACEMENT PrevWP;
 
 	i64 PerformanceFrequence;

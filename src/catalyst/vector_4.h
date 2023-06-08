@@ -3,7 +3,7 @@
 
 #include "typesdef.h"
 
-struct vector_4
+struct Vector4
 {
 	union
 	{
@@ -27,9 +27,9 @@ struct vector_4
 	};
 };
 
-inline vector_4 V4(r32 x, r32 y, r32 z, r32 w)
+inline Vector4 V4(r32 x, r32 y, r32 z, r32 w)
 {
-	vector_4 result = {};
+	Vector4 result = {};
 
 	result.X = x;
 	result.Y = y;
@@ -39,9 +39,9 @@ inline vector_4 V4(r32 x, r32 y, r32 z, r32 w)
 	return result;
 }
 
-inline vector_4 operator-(vector_4 a)
+inline Vector4 operator-(Vector4 a)
 {
-	vector_4 result = {};
+	Vector4 result = {};
 
 	result.X = -a.X;
 	result.Y = -a.Y;
@@ -51,9 +51,9 @@ inline vector_4 operator-(vector_4 a)
 	return result;
 }
 
-inline vector_4 operator+(vector_4 a, vector_4 b)
+inline Vector4 operator+(Vector4 a, Vector4 b)
 {
-	vector_4 result = {};
+	Vector4 result = {};
 
 	result.X = a.X + b.X;
 	result.Y = a.Y + b.Y;
@@ -63,9 +63,9 @@ inline vector_4 operator+(vector_4 a, vector_4 b)
 	return result;
 }
 
-inline vector_4 operator-(vector_4 a, vector_4 b)
+inline Vector4 operator-(Vector4 a, Vector4 b)
 {
-	vector_4 result = {};
+	Vector4 result = {};
 
 	result.X = a.X - b.X;
 	result.Y = a.Y - b.Y;
@@ -75,9 +75,9 @@ inline vector_4 operator-(vector_4 a, vector_4 b)
 	return result;
 }
 
-inline vector_4 operator*(vector_4 a, r32 b)
+inline Vector4 operator*(Vector4 a, r32 b)
 {
-	vector_4 result = {};
+	Vector4 result = {};
 
 	result.X = b * a.X;
 	result.Y = b * a.Y;
@@ -87,18 +87,18 @@ inline vector_4 operator*(vector_4 a, r32 b)
 	return result;
 }
 
-inline vector_4 operator*(r32 a, vector_4 b)
+inline Vector4 operator*(r32 a, Vector4 b)
 {
 	return b * a;
 }
 
-inline vector_4 &operator+=(vector_4 &a, vector_4 b)
+inline Vector4 &operator+=(Vector4 &a, Vector4 b)
 {
 	a = a + b;
 	return a;
 }
 
-inline vector_4 &operator*=(vector_4 &a, r32 b)
+inline Vector4 &operator*=(Vector4 &a, r32 b)
 {
 	a = a * b;
 	return a;

@@ -6,9 +6,9 @@
 #include <catalyst/math.h>
 
 void draw_rectangle(
-	screen_buffer *buffer,
-	vector_2 vec_min, vector_2 vec_max,
-	vector_3 colour)
+	ScreenBuffer *buffer,
+	Vector2 vec_min, Vector2 vec_max,
+	Vector3 colour)
 {
 	i32 min_x = round_real32_to_int32(vec_min.X);
 	i32 max_x = round_real32_to_int32(vec_max.X);
@@ -50,17 +50,17 @@ void draw_rectangle(
 	}
 }
 
-DLL_EXPORT void update_and_render(game_memory *memory, game_input *input, screen_buffer *buffer)
+DLL_EXPORT void update_and_render(GameMemory *memory, GameInput *input, ScreenBuffer *buffer)
 {
-	game_state *current_game_state = (game_state *)memory->PermanentStorage;
+	GameState *game_state = (GameState *)memory->PermanentStorage;
 
 	if (!memory->IsInitialized)
 	{
 		memory->IsInitialized = true;
-		current_game_state->colour = V3(50, 50, 50);
+		game_state->colour = V3(50, 50, 50);
 	}
 
-	vector_3 *colour = &current_game_state->colour;
+	Vector3 *colour = &game_state->colour;
 
 	if (input->Controllers[0].MoveLeft.EndedDown)
 	{

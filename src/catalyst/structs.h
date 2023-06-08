@@ -9,27 +9,27 @@
    These are NOT for doing anything in the shipping game - they are
    blocking and the write doesn't protect against lost data!
 */
-struct debug_read_file_result
+struct DebugReadFileResult
 {
 	u32 ContentsSize;
 	void *Contents;
 };
 
-debug_read_file_result debug_platform_read_entire_file(char *file_name);
+DebugReadFileResult debug_platform_read_entire_file(char *file_name);
 void debug_platform_free_file_memory(void *memory);
 b32 debug_platform_write_entire_file(char *file_name, u32 MemorySize, void *memory);
 
 #define Debug_Platform_Free_File_Memory(name) void name(void *memory)
 typedef Debug_Platform_Free_File_Memory(platform_free_file_memory);
 
-#define Debug_Platform_Read_Entire_File(name) debug_read_file_result name(char *file_name)
+#define Debug_Platform_Read_Entire_File(name) DebugReadFileResult name(char *file_name)
 typedef Debug_Platform_Read_Entire_File(platform_read_entire_file);
 
 #define Debug_Platform_Write_Entire_File(name) b32 name(char *fileName, u32 memorySize, void *memory)
 typedef Debug_Platform_Write_Entire_File(platform_write_entire_file);
 #endif
 
-struct screen_buffer
+struct ScreenBuffer
 {
 	void *Memory;
 	int Width;
@@ -38,7 +38,7 @@ struct screen_buffer
 	int BytesPerPixel;
 };
 
-struct game_memory
+struct GameMemory
 {
 	memory_index PermanentStorageSize;
 	memory_index TransiateStorageSize;
@@ -51,13 +51,13 @@ struct game_memory
 	platform_write_entire_file *WriteFile;
 };
 
-struct game_button_state
+struct GameButtonState
 {
 	i32 HalfTransitionCount;
 	b32 EndedDown;
 };
 
-struct game_controller_input
+struct GameControllerInput
 {
 	b32 IsConnected;
 	b32 IsAnalog;
@@ -66,42 +66,42 @@ struct game_controller_input
 
 	union
 	{
-		game_button_state Buttons[12];
+		GameButtonState Buttons[12];
 
 		struct
 		{
-			game_button_state MoveUp;
-			game_button_state MoveDown;
-			game_button_state MoveLeft;
-			game_button_state MoveRight;
+			GameButtonState MoveUp;
+			GameButtonState MoveDown;
+			GameButtonState MoveLeft;
+			GameButtonState MoveRight;
 
-			game_button_state ActionUp;
-			game_button_state ActionDown;
-			game_button_state ActionLeft;
-			game_button_state ActionRight;
+			GameButtonState ActionUp;
+			GameButtonState ActionDown;
+			GameButtonState ActionLeft;
+			GameButtonState ActionRight;
 
-			game_button_state LeftShoulder;
-			game_button_state RightShoulder;
+			GameButtonState LeftShoulder;
+			GameButtonState RightShoulder;
 
-			game_button_state Back;
-			game_button_state Start;
+			GameButtonState Back;
+			GameButtonState Start;
 
 			// NOTE: All buttons must be added above this line
-			game_button_state Terminator;
+			GameButtonState Terminator;
 		};
 	};
 };
 
-struct game_input
+struct GameInput
 {
 	r64 TimeToAdvance;
 
-	game_controller_input Controllers[5];
+	GameControllerInput Controllers[5];
 };
 
-struct game_state
+struct GameState
 {
-	vector_3 colour;
+	Vector3 colour;
 };
 
 #endif
