@@ -57,40 +57,128 @@ DLL_EXPORT void update_and_render(GameMemory *memory, GameInput *input, ScreenBu
 	if (!memory->IsInitialized)
 	{
 		memory->IsInitialized = true;
-		game_state->colour = V3(50, 50, 50);
+
+		game_state->PlayerPosition.X = 40;
+		game_state->PlayerPosition.Y = 30;
 	}
 
-	Vector3 *colour = &game_state->colour;
+	Vector2 player_momentum = {0, 0};
 
+	// Player movement
 	if (input->Controllers[0].MoveLeft.EndedDown)
 	{
-		colour->R += 1;
-
-		if (colour->R > 255)
-		{
-			colour->R = 0;
-		}
+		player_momentum.X -= 1;
 	}
 
 	if (input->Controllers[0].MoveRight.EndedDown)
 	{
-		colour->G += 1;
+		player_momentum.X += 1;
+	}
 
-		if (colour->G > 255)
-		{
-			colour->G = 0;
-		}
+	if (input->Controllers[0].MoveDown.EndedDown)
+	{
+		player_momentum.Y += 1;
 	}
 
 	if (input->Controllers[0].MoveUp.EndedDown)
 	{
-		colour->B += 1;
-
-		if (colour->B > 255)
-		{
-			colour->B = 0;
-		}
+		player_momentum.Y -= 1;
 	}
 
-	draw_rectangle(buffer, V2(0, 0), V2(buffer->Width, buffer->Height), *colour);
+	r32 player_speed = 80.f;
+
+	player_momentum.X *= player_speed;
+	player_momentum.Y *= player_speed;
+
+	// Movement in seconds
+	game_state->PlayerPosition.X += player_momentum.X * input->DeltaTime;
+	game_state->PlayerPosition.Y += player_momentum.Y * input->DeltaTime;
+
+	// if (game_state->PlayerPosition.X > 17)
+	// {
+	// 	game_state->PlayerPosition.X = 0;
+	// }
+
+	// if (game_state->PlayerPosition.X < 0)
+	// {
+	// 	game_state->PlayerPosition.X = 9;
+	// }
+
+	// if (game_state->PlayerPosition.Y > 9)
+	// {
+	// 	game_state->PlayerPosition.Y = 0;
+	// }
+
+	// if (game_state->PlayerPosition.Y < 0)
+	// {
+	// 	game_state->PlayerPosition.Y = 9;
+	// }
+
+	u32 tileMap[9][17] = {
+		{1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1},
+		{1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1},
+		{0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0},
+		{1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1},
+		{1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1},
+		{1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1}};
+
+	Vector3 tile_colour;
+	tile_colour.G = 0.5f;
+	tile_colour.B = 0.5f;
+	tile_colour.R = 0.5f;
+
+	r32 tile_width = 100.0f;
+	r32 tile_height = 100.0f;
+
+	Vector2 min;
+	Vector2 max;
+
+	draw_rectangle(buffer, min, max, tile_colour);
+
+	for (i32 row = 0; row < 9; row++)
+	{
+		for (i32 column = 0; column < 17; column++)
+		{
+			u32 tileId = tileMap[row][column];
+
+			if (tileId == 1)
+			{
+				tile_colour.G = 1;
+				tile_colour.B = 1;
+				tile_colour.R = 1;
+			}
+			else
+			{
+				tile_colour.G = 0.5f;
+				tile_colour.B = 0.5f;
+				tile_colour.R = 0.5f;
+			}
+
+			min.X = column * tile_width;
+			min.Y = row * tile_height;
+
+			max.X = min.X + tile_width;
+			max.Y = min.Y + tile_height;
+
+			draw_rectangle(buffer, min, max, tile_colour);
+		}
+
+		u32 player_width = tile_width * 0.75f;
+		u32 player_height = tile_height;
+
+		min.X = game_state->PlayerPosition.X - (0.5f * player_width);
+		min.Y = game_state->PlayerPosition.Y - player_height;
+
+		max.X = min.X + player_width;
+		max.Y = min.Y + player_height;
+
+		tile_colour.G = 0.0f;
+		tile_colour.B = 0.0f;
+		tile_colour.R = 0.0f;
+
+		draw_rectangle(buffer, min, max, tile_colour);
+	}
 }

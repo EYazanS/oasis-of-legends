@@ -94,14 +94,14 @@ struct GameControllerInput
 
 struct GameInput
 {
-	r64 TimeToAdvance;
+	r64 DeltaTime;
 
 	GameControllerInput Controllers[5];
 };
 
 struct GameState
 {
-	Vector3 colour;
+	Vector2 PlayerPosition;
 };
 
 #endif

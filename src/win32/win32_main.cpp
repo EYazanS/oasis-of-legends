@@ -376,7 +376,7 @@ int WINAPI wWinMain(
 
 	while (state.IsRunning)
 	{
-		current_input->TimeToAdvance = target_seconds_to_advance_by;
+		current_input->DeltaTime = target_seconds_to_advance_by;
 
 		FILETIME new_last_write_time = get_file_last_write_date(source_game_code_dll_full_path);
 
