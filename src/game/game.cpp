@@ -18,16 +18,24 @@ void draw_rectangle(
 
 	// Clip to the nearest valid pixel
 	if (min_x < 0)
+	{
 		min_x = 0;
+	}
 
 	if (min_y < 0)
+	{
 		min_y = 0;
+	}
 
 	if (max_x > buffer->Width)
+	{
 		max_x = buffer->Width;
+	}
 
 	if (max_y > buffer->Height)
+	{
 		max_y = buffer->Height;
+	}
 
 	// Bit Pattern = x0 AA RR GG BB
 	u32 final_colour =
@@ -67,25 +75,30 @@ DLL_EXPORT void update_and_render(GameMemory *memory, GameInput *input, ScreenBu
 	// Player movement
 	if (input->Controllers[0].MoveLeft.EndedDown)
 	{
-		player_momentum.X -= 1;
+		player_momentum.X = -1;
 	}
 
 	if (input->Controllers[0].MoveRight.EndedDown)
 	{
-		player_momentum.X += 1;
+		player_momentum.X = 1;
 	}
 
 	if (input->Controllers[0].MoveDown.EndedDown)
 	{
-		player_momentum.Y += 1;
+		player_momentum.Y = 1;
 	}
 
 	if (input->Controllers[0].MoveUp.EndedDown)
 	{
-		player_momentum.Y -= 1;
+		player_momentum.Y = -1;
 	}
 
-	r32 player_speed = 80.f;
+	r32 player_speed = 64.f;
+
+	if (input->Controllers[0].ActionLeft.EndedDown)
+	{
+		player_speed = 128.f;
+	}
 
 	player_momentum.X *= player_speed;
 	player_momentum.Y *= player_speed;
@@ -93,26 +106,6 @@ DLL_EXPORT void update_and_render(GameMemory *memory, GameInput *input, ScreenBu
 	// Movement in seconds
 	game_state->PlayerPosition.X += player_momentum.X * input->DeltaTime;
 	game_state->PlayerPosition.Y += player_momentum.Y * input->DeltaTime;
-
-	// if (game_state->PlayerPosition.X > 17)
-	// {
-	// 	game_state->PlayerPosition.X = 0;
-	// }
-
-	// if (game_state->PlayerPosition.X < 0)
-	// {
-	// 	game_state->PlayerPosition.X = 9;
-	// }
-
-	// if (game_state->PlayerPosition.Y > 9)
-	// {
-	// 	game_state->PlayerPosition.Y = 0;
-	// }
-
-	// if (game_state->PlayerPosition.Y < 0)
-	// {
-	// 	game_state->PlayerPosition.Y = 9;
-	// }
 
 	u32 tileMap[9][17] = {
 		{1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1},

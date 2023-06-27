@@ -190,7 +190,6 @@ GameMemory init_game_memory()
 	game_memory.PermanentStorage = VirtualAlloc(base_address, total_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 	game_memory.TransiateStorage = (u8 *)game_memory.PermanentStorage + game_memory.PermanentStorageSize;
 
-
 	game_memory.FreeFile = debug_platform_free_file_memory;
 	game_memory.ReadFile = debug_platform_read_entire_file;
 	game_memory.WriteFile = debug_platform_write_entire_file;
@@ -445,7 +444,7 @@ int WINAPI wWinMain(
 					case SDLK_UP:
 						SDLProcessKeyPress(&new_keyboard_controller->ActionUp, is_down);
 						break;
-					case SDLK_LEFT:
+					case SDLK_LCTRL:
 						SDLProcessKeyPress(&new_keyboard_controller->ActionLeft, is_down);
 						break;
 					case SDLK_DOWN:
