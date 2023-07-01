@@ -317,7 +317,12 @@ int WINAPI wWinMain(
 	}
 
 	// Create window
-	window = SDL_CreateWindow("Oasis of legends", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, state.WindowWidth, state.WindowHeight, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("Oasis of legends",
+							  SDL_WINDOWPOS_UNDEFINED,
+							  SDL_WINDOWPOS_UNDEFINED,
+							  state.WindowWidth,
+							  state.WindowHeight,
+							  SDL_WINDOW_OPENGL);
 
 	if (window == NULL)
 	{
@@ -339,18 +344,21 @@ int WINAPI wWinMain(
 		return -1;
 	}
 
+	// Initialize GLEW
 	GLenum err = glewInit();
 
 	if (err != GLEW_OK)
 	{
-		// Handle GLEW initialization error
-		printf("Glew Context could not be created!\n");
-
+		printf("GLEW initialization failed! Error: %s\n", glewGetErrorString(err));
+		SDL_GL_DeleteContext(context);
+		SDL_DestroyWindow(window);
 		SDL_Quit();
-
 		return -1;
 	}
 
+	// Clear color buffer
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
 	SDL_GL_SwapWindow(window);
 
 	// Create a "renderer" for our window.
@@ -580,10 +588,9 @@ int WINAPI wWinMain(
 		last_cycle_count = __rdtsc();
 	}
 
-	// Destroy window
+	// Cleanup
+	SDL_GL_DeleteContext(context);
 	SDL_DestroyWindow(window);
-
-	// Quit SDL subsystems
 	SDL_Quit();
 
 	return 0;
