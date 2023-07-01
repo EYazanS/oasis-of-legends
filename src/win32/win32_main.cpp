@@ -52,7 +52,7 @@ DebugReadFileResult debug_platform_read_entire_file(char *file_name)
 				{
 					result.ContentsSize = file_size_32;
 
-					result.Contents = mem_result;
+					result.Memory = mem_result;
 				}
 				else
 				{
@@ -364,7 +364,7 @@ int WINAPI wWinMain(
 	// Create a "renderer" for our window.
 	SDL_Renderer *renderer = SDL_CreateRenderer(window,
 												-1,
-												SDL_RENDERER_PRESENTVSYNC);
+												SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 	SDL_Texture *texture = SDL_CreateTexture(renderer,
 											 SDL_PIXELFORMAT_ARGB8888,
@@ -488,16 +488,7 @@ int WINAPI wWinMain(
 						SDLProcessKeyPress(&new_keyboard_controller->ActionRight, is_down);
 						break;
 					case SDLK_ESCAPE:
-						printf("ESCAPE: ");
-						if (is_down)
-						{
-							printf("Is Down\n");
-						}
-						if (was_down)
-						{
-							printf("Was Down\n");
-						}
-						printf("\n");
+						state.IsRunning = false;
 						break;
 					case SDLK_SPACE:
 						break;
