@@ -203,6 +203,35 @@ DLL_EXPORT void update_and_render(GameMemory *memory, GameInput *input, ScreenBu
 
 		game_state->Background = debug_load_Bmp(memory->ReadFile, "assets/test/test_background.bmp");
 
+		PlayerSprite *player_sprites;
+		player_sprites = game_state->PlayerSprites;
+
+		player_sprites->Head = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_right_head.bmp");
+		player_sprites->Cape = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_right_cape.bmp");
+		player_sprites->Torso = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_right_torso.bmp");
+		player_sprites->Shadow = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_shadow.bmp");
+		player_sprites->Align = {72, 182};
+
+		player_sprites++;
+		player_sprites->Head = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_back_head.bmp");
+		player_sprites->Cape = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_back_cape.bmp");
+		player_sprites->Torso = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_back_torso.bmp");
+		player_sprites->Shadow = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_shadow.bmp");
+		player_sprites->Align = {72, 182};
+
+		player_sprites++;
+		player_sprites->Head = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_left_head.bmp");
+		player_sprites->Cape = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_left_cape.bmp");
+		player_sprites->Torso = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_left_torso.bmp");
+		player_sprites->Shadow = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_shadow.bmp");
+		player_sprites->Align = {72, 182};
+
+		player_sprites++;
+		player_sprites->Head = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_front_head.bmp");
+		player_sprites->Cape = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_front_cape.bmp");
+		player_sprites->Torso = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_front_torso.bmp");
+		player_sprites->Shadow = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_shadow.bmp");
+		player_sprites->Align = {72, 182};
 		game_state->PlayerPosition.X = 40;
 		game_state->PlayerPosition.Y = 30;
 	}
@@ -307,4 +336,6 @@ DLL_EXPORT void update_and_render(GameMemory *memory, GameInput *input, ScreenBu
 	tile_colour.R = 0.0f;
 
 	draw_rectangle(buffer, min, max, tile_colour);
+
+	draw_bitmap(buffer, &game_state->PlayerSprites[0].Head, min.X, min.Y, 1);
 }

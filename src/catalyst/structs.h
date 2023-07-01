@@ -29,6 +29,16 @@ typedef Debug_Platform_Read_Entire_File(platform_read_entire_file);
 typedef Debug_Platform_Write_Entire_File(platform_write_entire_file);
 #endif
 
+enum class EntityType
+{
+	Null,
+	Player,
+	Wall,
+	Familiar,
+	Monster,
+	Sword
+};
+
 // To pack the struct tightly and prevent combiler from
 // aligning the fields
 #pragma pack(push, 1)
@@ -141,10 +151,38 @@ struct GameSprite
 	u32 *Data;
 };
 
+struct PlayerSprite
+{
+	GameSprite Head;
+	GameSprite Torso;
+	GameSprite Cape;
+	GameSprite Shadow;
+
+	Vector2 Align;
+};
+
+struct SimEntity
+{
+	u32 StorageIndex;
+	b32 NeedUpdat4e;
+
+	EntityType Type;
+
+	Vector2 Positionm, Velocity;
+
+	r32 Width, Height;
+
+	u32 FacingDirection;
+
+	r32 Speed;
+};
+
 struct GameState
 {
 	Vector2 PlayerPosition;
 	GameSprite Background;
+	SimEntity Player;
+	PlayerSprite PlayerSprites[4];
 };
 
 #endif
