@@ -5,6 +5,7 @@ and may not be redistributed without written permission.*/
 #include <Windows.h>
 #include <SDL.h>
 #include <stdio.h>
+#include <GL/glew.h>
 
 #include <catalyst/strings.h>
 #include <catalyst/memory.h>
@@ -316,7 +317,7 @@ int WINAPI wWinMain(
 	}
 
 	// Create window
-	window = SDL_CreateWindow("Oasis of legends", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, state.WindowWidth, state.WindowHeight, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow("Oasis of legends", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, state.WindowWidth, state.WindowHeight, SDL_WINDOW_OPENGL);
 
 	if (window == NULL)
 	{
@@ -326,6 +327,31 @@ int WINAPI wWinMain(
 
 		return -1;
 	}
+
+	SDL_GLContext context = SDL_GL_CreateContext(window);
+
+	if (!context)
+	{
+		printf("OpenGl Context could not be created! SDL_Error: %s\n", SDL_GetError());
+
+		SDL_Quit();
+
+		return -1;
+	}
+
+	GLenum err = glewInit();
+
+	if (err != GLEW_OK)
+	{
+		// Handle GLEW initialization error
+		printf("Glew Context could not be created!\n");
+
+		SDL_Quit();
+
+		return -1;
+	}
+
+	SDL_GL_SwapWindow(window);
 
 	// Create a "renderer" for our window.
 	SDL_Renderer *renderer = SDL_CreateRenderer(window,
