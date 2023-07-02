@@ -96,14 +96,11 @@ void draw_bitmap(ScreenBuffer *buffer, GameSprite *sprite, r32 real_min_x, r32 r
 
 	for (i64 y = minY; y < maxY; y++)
 	{
-
 		u32 *dest = (u32 *)destRow;
 		u32 *source = sourceRow;
 
 		for (i64 x = minX; x < maxX; x++)
 		{
-			// Enabling this cause game to crash becasue too much calculation for the cpu on 60fps
-#if 1
 			// Linear blend
 			r32 a = (r32)((*source >> 24) & 0xFF) / 255.0f;
 			a *= alpha;
@@ -123,13 +120,6 @@ void draw_bitmap(ScreenBuffer *buffer, GameSprite *sprite, r32 real_min_x, r32 r
 			u32 result = (((u32)(r + 0.5f) << 16) | ((u32)(g + 0.5f) << 8) | ((u32)(b + 0.5f)) << 0);
 
 			*dest = result;
-#else
-			// Alpha Test
-			if (*source >> 24 > 124)
-			{
-				*dest = *source;
-			}
-#endif // 0
 
 			dest++;
 			source++;
@@ -203,35 +193,10 @@ DLL_EXPORT void update_and_render(GameMemory *memory, GameInput *input, ScreenBu
 
 		game_state->Background = debug_load_Bmp(memory->ReadFile, "assets/test/test_background.bmp");
 
-		PlayerSprite *player_sprites;
-		player_sprites = game_state->PlayerSprites;
+		PlayerSprites *player_sprites = game_state->PlayerSprites;
 
-		player_sprites->Head = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_right_head.bmp");
-		player_sprites->Cape = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_right_cape.bmp");
-		player_sprites->Torso = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_right_torso.bmp");
-		player_sprites->Shadow = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_shadow.bmp");
-		player_sprites->Align = {72, 182};
+		player_sprites->Idle = debug_load_Bmp(memory->ReadFile, "assets/player/player_idle.bmp");
 
-		player_sprites++;
-		player_sprites->Head = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_back_head.bmp");
-		player_sprites->Cape = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_back_cape.bmp");
-		player_sprites->Torso = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_back_torso.bmp");
-		player_sprites->Shadow = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_shadow.bmp");
-		player_sprites->Align = {72, 182};
-
-		player_sprites++;
-		player_sprites->Head = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_left_head.bmp");
-		player_sprites->Cape = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_left_cape.bmp");
-		player_sprites->Torso = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_left_torso.bmp");
-		player_sprites->Shadow = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_shadow.bmp");
-		player_sprites->Align = {72, 182};
-
-		player_sprites++;
-		player_sprites->Head = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_front_head.bmp");
-		player_sprites->Cape = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_front_cape.bmp");
-		player_sprites->Torso = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_front_torso.bmp");
-		player_sprites->Shadow = debug_load_Bmp(memory->ReadFile, "assets/test/test_hero_shadow.bmp");
-		player_sprites->Align = {72, 182};
 		game_state->PlayerPosition.X = 40;
 		game_state->PlayerPosition.Y = 30;
 	}
@@ -307,9 +272,9 @@ DLL_EXPORT void update_and_render(GameMemory *memory, GameInput *input, ScreenBu
 
 			if (tileId == 1)
 			{
-				tile_colour.G = 1;
-				tile_colour.B = 1;
-				tile_colour.R = 1;
+				tile_colour.G = 0;
+				tile_colour.B = 0;
+				tile_colour.R = 0;
 
 				min.X = column * tile_width;
 				min.Y = row * tile_height;
@@ -322,8 +287,8 @@ DLL_EXPORT void update_and_render(GameMemory *memory, GameInput *input, ScreenBu
 		}
 	}
 
-	u32 player_width = tile_width * 0.75f;
-	u32 player_height = tile_height;
+	u32 player_width = 64;
+	u32 player_height = 64;
 
 	min.X = game_state->PlayerPosition.X - (0.5f * player_width);
 	min.Y = game_state->PlayerPosition.Y - player_height;
@@ -331,11 +296,11 @@ DLL_EXPORT void update_and_render(GameMemory *memory, GameInput *input, ScreenBu
 	max.X = min.X + player_width;
 	max.Y = min.Y + player_height;
 
-	tile_colour.G = 0.0f;
-	tile_colour.B = 0.0f;
-	tile_colour.R = 0.0f;
+	tile_colour.G = 1.0f;
+	tile_colour.B = 1.0f;
+	tile_colour.R = 1.0f;
 
 	draw_rectangle(buffer, min, max, tile_colour);
 
-	draw_bitmap(buffer, &game_state->PlayerSprites[0].Head, min.X, min.Y, 1);
+	draw_bitmap(buffer, &game_state->PlayerSprites[0].Idle, min.X, min.Y, 1);
 }

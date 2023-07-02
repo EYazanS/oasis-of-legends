@@ -151,13 +151,9 @@ struct GameSprite
 	u32 *Data;
 };
 
-struct PlayerSprite
+struct PlayerSprites
 {
-	GameSprite Head;
-	GameSprite Torso;
-	GameSprite Cape;
-	GameSprite Shadow;
-
+	GameSprite Idle;
 	Vector2 Align;
 };
 
@@ -182,7 +178,7 @@ struct GameState
 	Vector2 PlayerPosition;
 	GameSprite Background;
 	SimEntity Player;
-	PlayerSprite PlayerSprites[4];
+	PlayerSprites PlayerSprites[4];
 };
 
 #endif

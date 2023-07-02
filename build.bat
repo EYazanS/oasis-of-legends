@@ -9,6 +9,7 @@ set SUBFILENAME=%SUBFILENAME: =0%
 
 xcopy /E /I /D /Y "./libs/sdl/lib" "./build"
 xcopy /E /I /D /Y "./libs/glew/lib" "./build"
+xcopy /E /I /D /Y "./assets" "./build/assets"
 
 pushd build
 
